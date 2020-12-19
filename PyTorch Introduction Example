@@ -1,0 +1,201 @@
+# Import PyTorch
+import torch
+# Tensor Basics
+# A tensor is a multi-dimensional array object that can store a single type of numeric data as a scalar,
+# vector, or n-dimensional matrix
+# Scalar (floating point data type)
+scalar_tensor = torch.tensor(10.)
+print(scalar_tensor)
+# data type is 32-bit float by default(single precision)
+print(scalar_tensor.dtype)
+# Vector
+vector_tensor = torch.tensor([10.,32,28,12,0])
+print(vector_tensor)
+# Matrix
+matrix_tensor = torch.tensor([
+    [1,2,3],
+    [4,5,6],
+    [7,8,9],
+    [10,11,12]
+])
+print(matrix_tensor)
+# Print dtype of matrix_tensor
+print(matrix_tensor.dtype)
+# Multi dimensional array:
+matrix_3d = torch.tensor([
+    [[1,2,3],
+     [4,5,6]],
+    [[10,11,12],
+     [13,14,15]]
+])
+print(matrix_3d)
+# What is the shape matrix_3d
+print(matrix_3d.shape)
+# List 2x2x2 3D matrix
+T_data = [[[1.,2.],[3.,4.]],
+          [[5.,6.],[7.,8.]]]
+T = torch.tensor(T_data)
+print(T)
+print(T.shape)
+# Creating full_tensor
+full_tensor = torch.full((2,4,3), 10.)
+print(full_tensor)
+# Create tensor of zeros
+zeros_tensor = torch.zeros(1,4)
+print(zeros_tensor)
+# Create tensor of ones
+ones_tensor = torch.ones(1,4)
+print(ones_tensor)
+# Generate a random matrix
+normal_random_tensor = torch.rand(1,3,2)
+print(normal_random_tensor)
+# Stacking tensors concatenate
+ones_zeros_stack_t = torch.cat((ones_tensor,zeros_tensor))
+print(ones_zeros_stack_t)
+# Empty: creates a 3x3 uninitialized matrix
+print(torch.empty(size=(3,3)))
+# Zeros: size is the first arg
+print(torch.zeros((3,3)))
+# Rand: initialized fro unif distribution [0,1]
+print(torch.rand((3,3)))
+# Ones: all ones
+print(torch.ones((3,3)))
+# Eye: identity matrix, ones on diag & rest zeros
+print(torch.eye(5,5))
+# Arange: ~similar to matlab~
+print(torch.arange(start=0, end=5, step=1))
+# Linear spacing - linspace ~similar to matlab~
+print(torch.linspace(start=0.1, end=1, steps=10))
+# Normally dist empty tensor
+print(torch.empty(size=(1,5)).normal_(mean=0, std=1))
+# Unif with lower & upper
+print(torch.empty(size=(1,5)).uniform_(0,1))
+# Same as identity matrix of size 3
+print(torch.diag(torch.ones(3)))
+
+# Type conversion with PyTorch tensors:
+tensor = torch.arange(2)
+# Convert to boolean(bool, short, long, half, float, double)
+print(tensor.bool()) # boolean
+print(tensor.short()) # short: creates int16
+print(tensor.long()) # long: int64, commonly used
+print(tensor.half()) # half: float16 for newer GPU based training
+print(tensor.float()) # float: float32, often used
+print(tensor.double()) # double: float64
+
+# Matrix Multiplication
+x = torch.tensor([[1.,2.,3.],[1.5,0.,3.5]])
+y = torch.tensor([[4.,5.,6.],[1.,1.,1.],[-4.,1.,0.]])
+z = x.mm(y)
+print(x.shape,y.shape,z.shape)
+print(z)
+
+# Reshaping
+x = torch.randn(2,3,4)
+print(x)
+print(x.view(2,12)) # Reshape to 2 rows, 12 columns
+# Same as above. if one of the dimensions is -1, its size can be inferred
+print(x.view(2, -1))
+
+# Computational graphs & auto-differentiation
+# Tensor factory methods have ``requires_grad`` flag
+x = torch.tensor([-1.,22.,15], requires_grad=True)
+# With requires_grad=True, you can still do all the operations you previously could
+y = torch.tensor([4.,5.,6], requires_grad=True)
+z = x + y
+print(z)
+# But z knows something extra
+print(z.grad_fn)
+# Lets sum up all the entries in z
+s = z.sum()
+print(s)
+print(s.grad_fn)
+# Calling .backward() on any variable will run backprop, starting from it
+print("x.grad: ", x.grad)
+s.backward()
+print("x.grad: ", x.grad)
+print(x.requires_grad)
+print((x**2).requires_grad)
+# Specify tht there is need to calculate gradient
+with torch.no_grad():
+    print((x**2).requires_grad)
+
+# PyTorch Autograd - Exercise 1
+# Create tensors
+x = torch.tensor(1., requires_grad=True)
+w = torch.tensor(2., requires_grad=True)
+b = torch.tensor(3., requires_grad=True)
+# Build computational graph
+y = x * x + b # y = 2 * x + 3
+# Compute gradients
+y.backward()
+# Print out the gradients
+print(x.grad) # x.grad = 2
+print(w.grad) # w.grad = 1
+print(b.grad) # b.grad = 1
+
+# Build a computational graph for y =(w1 * x +b1) * w2 +b2
+# Compute gradients for w1,w2,b1 and b2
+# Create tensors
+x = torch.tensor(1., requires_grad=False)
+w1 = torch.tensor(2., requires_grad=True)
+b1 = torch.tensor(3., requires_grad=True)
+w2 = torch.tensor(4., requires_grad=True)
+b2 = torch.tensor(5., requires_grad=True)
+
+# Build a computational graph
+y = (w1 * x + b1) * w2 + b2
+
+# Compute gradients
+y.backward()
+
+# Print out the gradients
+print(x.grad)
+print(w1.grad)
+print(b1.grad)
+print(w2.grad)
+print(b2.grad)
+
+# Autograph Example 2
+import torch.nn as nn
+# Create tensor of shape(10, 3) and (10,2)
+x = torch.randn(10, 3)
+y = torch.randn(10, 2)
+
+# Build a fully connected layer
+linear = nn.Linear(3,2)
+print('w: ', linear.weight)
+print('b: ', linear.bias)
+
+# Build loss function and optimizer
+criterion = nn.MSELoss()
+optimizer = torch.optim.SGD(linear.parameters(), lr=0.01)
+
+# Forward pass
+pred = linear(x)
+
+# Compute loss
+loss = criterion(pred, y)
+print('loss: ', loss.item())
+
+# Backward pass
+loss.backward()
+
+# Print out the gradients
+print('dl/dw: ', linear.weight.grad)
+print('dl/db: ', linear.bias.grad)
+
+# 1-step gradient descent
+optimizer.step()
+
+# You can also perform gradient descent at the low level
+# linear.weight.data.sub_(0.01 * linear.weight.grad.data)
+# linear.bias.data.sub_(0.01 * linear.bias.grad.data)
+# Print out the loss after 1-step gradient descent
+pred = linear(x)
+loss = criterion(pred, y)
+print('loss after 1 step optimization: ', loss.item())
+
+
+
+
