@@ -1,0 +1,120 @@
+# Deep learning based Neural Machine Translation approach with some theoretical backround and
+# heavy labs usage
+
+# Neural Machine Translation:
+#   word2vec from Google
+#   GloVe from Stamford
+#   ELMo (Embeddings from Language Models) memory augmented deep learning
+#   Transformer
+
+# Underlying common approaches:
+#   Model, Training data, Training process
+
+# Classic vs. DL NLP
+
+# Classical:
+#   Task customization for NLP Applications
+
+# DL Based NLP:
+#   Compressed representation
+#   Word Embeddings
+
+# Applications of NLP:
+#   Language Understanding
+#   Language Modeling
+#   Natural Language Processing
+
+# Common Applications of NLP
+#   Machine Translation: Translating from one language to another Google Translate
+#   Speech Recognition: Alexa, Siri, Cortana
+#   Question Answering: Understanding what the user wants Google Assistant
+#   Text Summarization: Concise version of long text
+#   Chatbots
+#   Text2Speech, Speech2Text: Translation of text into spoken words and vice versa
+#   Voicebots
+#   Text and auto-generation
+#   Sentiment analysis
+#   Information extraction
+
+# NLP Tasks
+#   Tokenization: splitting text into meaningful units(words, symbols)
+#   POS tagging: Words->Tokens(verbs, nouns, prepositions)
+#   Dependency Parsing: Labeling relationship between tokens
+#   Chunking: Combine related tokens ("San Francisco")
+#   Lemmatization: Convert base form of words(slept->sleep)
+#   Stemming: Reduce word to its stem(dance->danc)
+#   Name Entity Recognition: Assigning labels to known objects(Person, Org, Date)
+#   Entity Linking: Disambiguation, entities across texts
+
+# NLP Tasks: Working through examples
+# Start with clean text, without immaterial items, such as HTML tags from web scraped corpus
+# Normalize: Normalize text by converting it to all lower case , removing punctuation, &
+# extra white space
+# Tokenize: Split text into words, n-grams, or phrases(tokens):
+#   "I","love","morning","runs"
+#       Unigrams: "I","love","morning","runs"
+#       Bigrams(n=2): "I love","love morning","morning runs"
+#       Trigrams(n=3): "I love mornings", "love morning runs"
+# Remove stop words: Remove common words like "a","the","and","on",ect.
+# Stemming: convert to stem
+# POS, NER: Identify Parts of Speech(POS), such as verb, noun, named entity
+#   Lemmatization: root word(am, are, is >. be)
+
+# Top NLP Packages
+# NLTK:
+#   Preprocesing: Tokenizing, POS-tagging, Lemmatizing, Stemming
+#   Cons: Slow, not optimized
+# Gensim:
+#   Specialized, optimized library for topic-modeling and document similarity
+# Spacy
+#   "Industry-ready" NLP modeles
+#   Optimized algorithms for tokenization, POS tagging
+#   Text parsing, similarity calculation with word vectors
+# HuggingFace - Transformers/Datasets
+
+# Starting from scratch
+# Normalization: convert every letter to a common case so each word is represented by unique token  
+import re
+text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+text = text.lower()
+text = re.sub(r"[^a-zA-Z0-9]", " ",text)
+# Token: Implies symbol, splitting each sentence into words
+text = text.split()
+from nltk.tokenize import word_tokenize
+words = word_tokenize(text)
+# NLTK: Split text into sentences
+from nltk.tokenize import sent_tokenize
+sentences = sent_tokenize(text)
+
+# NLP Data Science some concepts and techniques
+# Word vectors, tokenization, document vectorization
+# POS (parts of speech), NER
+# Document parsing techniques, Regex
+# Supervised ML, Classifiers, Deep Learning and how to use word embeddings
+# Using Pretrained models
+
+# Sequence-to-sequence learning:
+# Seq2Seq is about training models to convert sequences from one domain (e.g. sentences in English)
+# to sequences in another domain (e.g. the same sentences translated to French)
+
+import torch.nn as nn
+# The Encoder
+class EncoderRNN(nn.Module):
+    def __int__(self, input_size, hidden_size):
+        super(EncoderRNN,self)__init__()
+        self.hidden_size= hidden_size
+
+        self.embedding = nn.Embedding(input_size, hidden_size)
+        self.gru = nn.GRU(hidden_size, hidden_size)
+    def forward(self, input, hidden):
+        embedded = self.embedding(input).view(1,1,-1)
+        output = embedded
+        output, hidden = self.gru(output, hidden)
+        return output, hidden
+
+    def initHidden(self):
+        return torch.zeros(1,1, self.hidden_size, device=device)
+    
+
+
+
